@@ -1,0 +1,16 @@
+const header=document.getElementById('siteHeader');
+const toggle=document.getElementById('menuToggle');
+const nav=document.getElementById('nav');
+const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const onScroll=()=>{header.classList.toggle('scrolled',scrollY>35);if(!reduced){const media=document.querySelector('.hero-media');media.style.transform=`scale(1.04) translateY(${scrollY*.12}px)`;}};
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+toggle.addEventListener('click',()=>{const open=nav.classList.toggle('open');toggle.setAttribute('aria-expanded',open);toggle.setAttribute('aria-label',open?'Chiudi menu':'Apri menu');});
+nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');toggle.setAttribute('aria-expanded','false');}));
+const io=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target);}}),{threshold:.14});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+const countIO=new IntersectionObserver(entries=>entries.forEach(e=>{if(!e.isIntersecting)return;const el=e.target,target=Number(el.dataset.count),suffix=el.dataset.suffix||'',start=performance.now(),duration=1300;const tick=now=>{const p=Math.min((now-start)/duration,1);el.textContent=Math.floor(target*(1-Math.pow(1-p,3)))+suffix;if(p<1)requestAnimationFrame(tick)};requestAnimationFrame(tick);countIO.unobserve(el);}),{threshold:.6});
+document.querySelectorAll('[data-count]').forEach(el=>countIO.observe(el));
+const dateInput=document.querySelector('input[type="date"]');
+const today=new Date();dateInput.min=today.toISOString().split('T')[0];
+document.getElementById('bookingForm').addEventListener('submit',e=>{e.preventDefault();const d=new FormData(e.currentTarget);const msg=`Ciao Rex Cafè Gourmet, vorrei richiedere un tavolo per ${d.get('ospiti')} il ${d.get('data')} alle ${d.get('ora')}. Nome: ${d.get('nome')}. Telefono: ${d.get('telefono')}. ${d.get('note')?'Note: '+d.get('note'):''}`;navigator.clipboard?.writeText(msg);document.getElementById('formStatus').textContent='Richiesta preparata e copiata. Puoi incollarla nel tuo canale di contatto preferito.';});
+document.getElementById('year').textContent=new Date().getFullYear();
